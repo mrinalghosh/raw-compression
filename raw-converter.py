@@ -7,8 +7,8 @@ import os
 '''
 Project Coral module to test processing time of RAW file to different file formats.
 Test data losses with different image storage paradigms (.jpeg, .tiff, .png) as well as post-compression
-Saved RAW frames will need a regex for automatic processing.
-Potentially could add a delete function for original files to minimize storage
+Saved RAW frames will need a regex for automatic processing according to format.
+Potentially could add a delete function for original RAW files to minimize storage.
 '''
 
 
@@ -28,9 +28,9 @@ if __name__ == "__main__":
 
     clock = stopclock()
 
-    for path in paths:
+    for path, file in zip(paths, files):
         with rawpy.imread(path) as raw:
             rgb = raw.postprocess()
-            imageio.imsave(f'001.tiff', rgb)
+            imageio.imsave(f'{file}', rgb)
 
-        clock.lap(f'save {path}')
+        clock.lap(f'save {path} ({(os.path.getsize(path)/1e6):.3}MB)')
