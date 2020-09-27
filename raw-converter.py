@@ -1,8 +1,11 @@
 #!/usr/bin/python3
 import rawpy
-import imageio
+# import imageio
+import cv2
 import time
 import os
+import tarfile
+from tqdm import tqdm
 
 '''
 Project Coral module to test processing time of RAW file to different file formats.
@@ -22,15 +25,32 @@ class stopclock():
         self.t = time.time()
 
 
+def compress(tf, files):
+    tar = tarfile.open(tf, mode='w:gz')
+    progress = tqdm(files)
+    for file in files:
+        tar.add(file)
+    tar.close()
+
+
 if __name__ == "__main__":
+    suffix = '.png'
+
     paths = ['001.ARW', '002.ARW', '003.ARW']
-    files = [path.split('.')[0]+'.tiff' for path in paths]
+    files = [path.split('.')[0]+suffix for path in paths]
+
+    zfile = 'images.zip'
 
     clock = stopclock()
 
     for path, file in zip(paths, files):
         with rawpy.imread(path) as raw:
-            rgb = raw.postprocess()
-            imageio.imsave(f'{file}', rgb)
+            rgb = raw.postprocess()  # numpy rgb array
+            image = cv2.cvtColor(rgb, cv2.COLOR_RGB2BGR)
+            cv2.imwrite(file, image)
 
-        clock.lap(f'save {path} ({(os.path.getsize(path)/1e6):.3}MB)')
+        clock.lap(
+            f'save {path} ({(os.path.getsize(path)/1e6):.3}MB) -> ({(os.path.getsize(file)/1e6):.3}MB)')
+
+    compress(zfile, files)
+    clock.lap(f'compress {files}')
