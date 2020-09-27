@@ -1,6 +1,5 @@
 #!/usr/bin/python3
 import rawpy
-# import imageio
 import cv2
 import time
 import os
@@ -36,10 +35,10 @@ def compress(tf, files):
 if __name__ == "__main__":
     suffix = '.png'
 
+    zfile = 'images.zip'
+
     paths = ['001.ARW', '002.ARW', '003.ARW']
     files = [path.split('.')[0]+suffix for path in paths]
-
-    zfile = 'images.zip'
 
     clock = stopclock()
 
